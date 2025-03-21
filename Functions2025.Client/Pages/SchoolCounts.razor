@@ -1,0 +1,59 @@
+@page "/school-counts"
+@using Functions2025.Models.School
+@using Functions2025.Client.Services 
+@inject StudentService StudentService
+
+<h3>Students Count by School</h3>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+else if (schoolCounts == null)
+{
+    <p><em>Loading...</em></p>
+}
+@* else if (!schoolCounts.Any())
+{
+    <p>No school count data available.</p>
+} *@
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>School</th>
+                <th>Student Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var school in schoolCounts)
+            {
+                <tr>
+                    <td>@school.School</td>
+                    <td>@school.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<SchoolCount>? schoolCounts;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            schoolCounts = await StudentService.GetStudentCountsBySchoolAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+            Console.WriteLine(ex);
+        }
+    }
+}
